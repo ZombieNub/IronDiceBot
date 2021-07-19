@@ -1,10 +1,11 @@
-# first-bot
+# IronDice
 
-A Discord bot designed to... well, that part is up to you.
+A discord bot I'm building for my friends.
 
 ## Usage
 
-FIXME
+`!r N` Rolls a dice from 1-N.
+`!r [name:N,name:N...]` Selects a random item in a list. Odds for each item are determined by N.
 
 ## License
 

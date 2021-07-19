@@ -6,13 +6,13 @@
   (inc (rand-int dice-amt)))
 
 (defmulti roll-handler
-  (fn [command out-func] (str/starts-with? (nth (:parameters command) 0) "[")))
+  (fn [command] (nth (:parameters command) 0)))
 
-(defmethod roll-handler false
-  [command out-func]
-  (let [matcher (re-matcher #"^d*(\d+)" (nth (:parameters command) 0))]
-    (re-find matcher)
-    (out-func (str "**" (nth (:parameters command) 0) ":** " (roll-generic-dice (Integer/parseInt (get (re-groups matcher) 1)))))))
+(defmethod roll-handler "dice"
+  [command]
+  (let [input (nth (:parameters command) 1)
+        output (roll-generic-dice (Integer/parseInt input))]
+    (str "**d" input " ->** " output)))
 
 (defn array-parameter-divider
   [entry] ;; a:17
@@ -23,8 +23,8 @@
   [map-entry]
   (take (:num map-entry) (repeat (:name map-entry))))
 
-(defmethod roll-handler true
-  [command out-func]
+(defmethod roll-handler "list"
+  [command]
   (-> command
       :parameters
       str/join
@@ -34,18 +34,17 @@
       (#(map array-parameter-to-seq %))
       flatten
       rand-nth
-      (#(str "**" (str/join (:parameters command)) ":** " %))
-      out-func))
+      (#(str "**" (str/join (:parameters command)) ":** " %))))
 
 (defmulti command-handler
-  (fn [command out-func] (:command command)))
+  (fn [command] (:command command)))
 
 (defmethod command-handler "!r"
-  [command out-func]
-  (roll-handler command out-func))
+  [command]
+  (roll-handler command))
 
 (defmethod command-handler :default
-  [command out-func]
+  [command]
   (println (str "Unrecognized command: " (:command command) ". Details: " command)))
 
 (defn parameterize
@@ -53,11 +52,11 @@
   {:command (get command 1) :parameters (rest (rest command))})
 
 (defn string-to-command
-  [string out-func]
+  [string]
   (try
     (-> string
         str/trim
         (str/split #"\s+")
         parameterize
-        (command-handler out-func))
+        command-handler)
     (catch Exception e (str "Exception: " (.getMessage e)))))

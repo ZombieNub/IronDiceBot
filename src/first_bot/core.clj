@@ -24,7 +24,7 @@
 (defmethod handle-event :message-create
   [_ {:keys [channel-id author mentions content] :as _data}]
   (when (some #{@bot-id} (map :id mentions))
-    (dice/string-to-command content #(discord-rest/create-message! (:rest @state) channel-id :content %))))
+    (discord-rest/create-message! (:rest @state) channel-id :content (dice/string-to-command content))))
 
 ;; (when (some #{@bot-id} (map :id mentions))
 ;;    (discord-rest/create-message! (:rest @state) channel-id :content (random-response author)))

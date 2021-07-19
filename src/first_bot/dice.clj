@@ -25,7 +25,6 @@
 
 (defn pick-random-entry
   [odds-pair-seq]
-  (println odds-pair-seq)
   (let [accu (accumulate-odds-pairs odds-pair-seq)
         rand-val (rand accu)]
     (loop [iter 0
@@ -37,7 +36,6 @@
 (defmethod roll-handler "list"
   [command]
   (let [input (rest (:parameters command))
-        _ (println input)
         output (-> input
                    (#(map string-to-odds-pair %))
                    pick-random-entry)

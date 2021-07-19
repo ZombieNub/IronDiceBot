@@ -12,29 +12,38 @@
   [command]
   (let [input (nth (:parameters command) 1)
         output (roll-generic-dice (Integer/parseInt input))]
-    (str "**d" input " ->** " output)))
+    (str "d" input " -> **" output "**")))
 
-(defn array-parameter-divider
+(defn string-to-odds-pair
   [entry] ;; a:17
   (let [key-and-num (str/split entry #":")]
-    {:name (nth key-and-num 0) :num (Integer/parseInt (nth key-and-num 1))}))
+    {:name (nth key-and-num 0) :num (Float/parseFloat (nth key-and-num 1))}))
 
-(defn array-parameter-to-seq
-  [map-entry]
-  (take (:num map-entry) (repeat (:name map-entry))))
+(defn accumulate-odds-pairs
+  [odds-pair-seq]
+  (reduce + (map :num odds-pair-seq)))
+
+(defn pick-random-entry
+  [odds-pair-seq]
+  (println odds-pair-seq)
+  (let [accu (accumulate-odds-pairs odds-pair-seq)
+        rand-val (rand accu)]
+    (loop [iter 0
+           accu-odds 0]
+      (if (< rand-val (+ (:num (nth odds-pair-seq iter)) accu-odds))
+        (nth odds-pair-seq iter)
+        (recur (inc iter) (+ accu-odds (:num (nth odds-pair-seq iter))))))))
 
 (defmethod roll-handler "list"
   [command]
-  (-> command
-      :parameters
-      str/join
-      (str/replace #"[\s\[\]]" "")
-      (str/split #",")
-      (#(map array-parameter-divider %))
-      (#(map array-parameter-to-seq %))
-      flatten
-      rand-nth
-      (#(str "**" (str/join (:parameters command)) ":** " %))))
+  (let [input (rest (:parameters command))
+        _ (println input)
+        output (-> input
+                   (#(map string-to-odds-pair %))
+                   pick-random-entry)
+        output-string (str (:name output) ":" (:num output))
+        output-name (:name output)]
+    (str (str/join " " input) " -> " output-string " -> **" output-name "**")))
 
 (defmulti command-handler
   (fn [command] (:command command)))
@@ -45,7 +54,7 @@
 
 (defmethod command-handler :default
   [command]
-  (println (str "Unrecognized command: " (:command command) ". Details: " command)))
+  (str "Unrecognized command: " (:command command) ". Details: " command))
 
 (defn parameterize
   [command]

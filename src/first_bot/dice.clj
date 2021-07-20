@@ -2,10 +2,14 @@
   (:require [clojure.string :as str]))
 
 (defn roll-generic-dice
+  "Utility function to make generic dice rolls easier."
   [dice-amt]
   (inc (rand-int dice-amt)))
 
 (defmulti roll-handler
+  "The !r command has two different ways of being used, and as such has its own handler.
+  !r dice N rolls a number between 1-N
+  !r list COLL picks a random item out of a list depending on weighted odds"
   (fn [command] (nth (:parameters command) 0)))
 
 (defmethod roll-handler "dice"
@@ -15,15 +19,18 @@
     (str "d" input " -> **" output "**")))
 
 (defn string-to-odds-pair
+  "Takes a string of name:num and returns a map of {:name name :num num}."
   [entry] ;; a:17
-  (let [key-and-num (str/split entry #":")]
-    {:name (nth key-and-num 0) :num (Float/parseFloat (nth key-and-num 1))}))
+  (let [[name num] (str/split entry #":")]
+    {:name name :num (Float/parseFloat num)}))
 
 (defn accumulate-odds-pairs
+  "Utility function for pick-random-entry"
   [odds-pair-seq]
   (reduce + (map :num odds-pair-seq)))
 
 (defn pick-random-entry
+  "Picks an option out of a list, depending on weighted odds. Could be simplified using reductions and drop-while, but I have no idea how to do so."
   [odds-pair-seq]
   (let [accu (accumulate-odds-pairs odds-pair-seq)
         rand-val (rand accu)]
@@ -44,6 +51,7 @@
     (str (str/join " " input) " -> " output-string " -> **" output-name "**")))
 
 (defmulti command-handler
+  "Selects which command to be used."
   (fn [command] (:command command)))
 
 (defmethod command-handler "!r"
@@ -55,10 +63,12 @@
   (str "Unrecognized command: " (:command command) ". Details: " command))
 
 (defn parameterize
-  [command]
-  {:command (get command 1) :parameters (rest (rest command))})
+  "This splits the inputted raw command into a 'command' and 'parameters' map, while dropping the @IronDice mention. This is done so command-handler can more easily select which multimethod should be used, while allowing the methods to handle the parameters however they are needed."
+  [raw-command]
+  {:command (get raw-command 1) :parameters (rest (rest raw-command))})
 
 (defn string-to-command
+  "Takes the command sent by the users (usually with an @ mention), modifies it, and send it to the command handler. Tries to return a string, but returns an exception if something goes wrong, informing the user."
   [string]
   (try
     (-> string

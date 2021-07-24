@@ -15,7 +15,7 @@
 
 (def bot-id (atom nil))
 
-(def config (edn/read-string (slurp "config.edn")))
+(def config (edn/read-string (slurp (clojure.java.io/resource "config.edn"))))
 
 (defmulti handle-event (fn [type _data] type))
 

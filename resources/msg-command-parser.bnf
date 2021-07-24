@@ -1,0 +1,27 @@
+command = mention? <whitespace> demand <whitespace> {statement <whitespace?>}
+
+demand = <"!"> word
+
+<statement> = word
+          | int
+          | float
+          | string
+          | statement-pair
+          | keyword
+          | (<"("> command <")">)
+
+mention = '<@!' int '>'
+
+statement-pair = statement ":" statement
+
+float = int '.' int
+
+int = #'\d+' &#'[\s\p{S}\p{P}]|$'
+
+keyword = word '=' statement
+
+string = <'\"'> {word{whitespace}} <'\"'>
+
+word = #'\w+' &#'\W|$'
+
+<whitespace> = #"\s+"

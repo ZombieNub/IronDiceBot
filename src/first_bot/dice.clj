@@ -1,10 +1,15 @@
 (ns first-bot.dice
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [instaparse.core :as insta :refer [defparser]]))
+
+(defparser msg-command-parser (clojure.java.io/resource "msg-command-parser.bnf"))
+
+(comment
 
 (defn roll-generic-dice
   "Utility function to make generic dice rolls easier."
-  [dice-amt]
-  (inc (rand-int dice-amt)))
+  [max]
+  (inc (rand-int max)))
 
 (defmulti roll-handler
   "The !r command has two different ways of being used, and as such has its own handler.
@@ -67,13 +72,11 @@
   [raw-command]
   {:command (get raw-command 1) :parameters (rest (rest raw-command))})
 
+)
+
 (defn string-to-command
   "Takes the command sent by the users (usually with an @ mention), modifies it, and send it to the command handler. Tries to return a string, but returns an exception if something goes wrong, informing the user."
   [string]
   (try
-    (-> string
-        str/trim
-        (str/split #"\s+")
-        parameterize
-        command-handler)
+    (msg-command-parser string)
     (catch Exception e (str "Exception: " (.getMessage e)))))

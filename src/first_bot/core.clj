@@ -25,7 +25,9 @@
 (defmethod handle-event :message-create
   [_ {:keys [channel-id author mentions content] :as _data}]
   (when (some #{@bot-id} (map :id mentions))
-    (discord-rest/create-message! (:rest @state) channel-id :content (dice/string-to-command content))))
+    (if (= content "<@!865428758940745728> !kill")
+      (discord-ws/disconnect-bot! (:gateway @state))
+      (discord-rest/create-message! (:rest @state) channel-id :content (dice/string-to-command content)))))
 
 ;; (when (some #{@bot-id} (map :id mentions))
 ;;    (discord-rest/create-message! (:rest @state) channel-id :content (random-response author)))
@@ -46,7 +48,6 @@
 
 (defn stop-bot! [{:keys [rest gateway events] :as _state}]
   (discord-rest/stop-connection! rest)
-  (discord-ws/disconnect-bot! gateway)
   (close! events))
 
 (defn -main [& args]

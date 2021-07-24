@@ -6,7 +6,8 @@
             [discljord.messaging :as discord-rest]
             [discljord.connections :as discord-ws]
             [discljord.formatting :refer [mention-user]]
-            [discljord.events :refer [message-pump!]]))
+            [discljord.events :refer [message-pump!]])
+  (:gen-class))
 
 (declare start-bot! stop-bot!)
 

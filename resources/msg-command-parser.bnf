@@ -18,7 +18,7 @@ mention = '<@!' int '>'
 
 statement-pair = statement ":" statement
 
-float = int '.' int
+float = (#'\d+' &#'[\s\p{S}\p{P}]|$') '.' (#'\d+' &#'[\s\p{S}\p{P}]|$')
 
 int = #'\d+' &#'[\s\p{S}\p{P}]|$'
 
@@ -28,4 +28,4 @@ string = <'\"'> {word{whitespace}} <'\"'>
 
 word = #'\w+' &#'\W|$'
 
-<whitespace> = #"\s+"
+whitespace = #"\s+"

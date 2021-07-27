@@ -20,12 +20,21 @@
   (let [temp-unconverted-args (rest type)
         is-kwarg? (fn [type] (= (first type) :keyword))
         pargs (map convert-type (filter (complement is-kwarg?) temp-unconverted-args))
-        kwargs (map convert-type (filter is-kwarg? temp-unconverted-args))]
+        kwargs (reduce-type (filter is-kwarg? temp-unconverted-args))]
     {:pargs pargs :kwargs kwargs}))
 
 (defmethod convert-type :demand
   [type]
   {:demand (keyword (convert-type (second type)))})
+
+(defmethod convert-type :statement-pair
+  [type]
+  (list (convert-type (nth type 1))
+        (convert-type (nth type 3))))
+
+(defmethod convert-type :float
+  [type]
+  (Float/parseFloat (apply str (rest type))))
 
 (defmethod convert-type :int
   [type]
@@ -34,7 +43,21 @@
       (Integer/parseInt val)
       (bigint val))))
 
+(defmethod convert-type :keyword
+  [type]
+  (let [keyword (keyword (convert-type (second type)))
+        statement (convert-type (nth type 3))]
+    {keyword statement}))
+
+(defmethod convert-type :string
+  [type]
+  (apply str (map convert-type (rest type))))
+
 (defmethod convert-type :word
+  [type]
+  (second type))
+
+(defmethod convert-type :whitespace
   [type]
   (second type))
 
@@ -53,5 +76,4 @@
 (defn interpret
   [string]
   (let [coll (msg-command-parser string)]
-    (pp/pprint coll)
     (convert-type coll)))

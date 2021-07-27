@@ -24,8 +24,10 @@ int = #'\d+' &#'[\s\p{S}\p{P}]|$'
 
 keyword = word '=' statement
 
-string = <'\"'> {word{whitespace}} <'\"'>
+string = <'\"'> {word | whitespace | punctuation} <'\"'>
 
 word = #'\w+' &#'\W|$'
+
+punctuation = #'\p{Punct}'
 
 whitespace = #"\s+"

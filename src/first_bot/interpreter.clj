@@ -57,6 +57,10 @@
   [type]
   (second type))
 
+(defmethod convert-type :punctuation
+  [type]
+  (second type))
+
 (defmethod convert-type :whitespace
   [type]
   (second type))

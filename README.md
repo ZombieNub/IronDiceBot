@@ -1,15 +1,15 @@
 # IronDice
 
-A discord bot I'm building for my friends.
+A discord dice bot for me an my friends.
 
 ## Usage
 
-`!r dice N` Rolls a dice from 1-N.
-`!r list name:N name:N...` Selects a random item in a list. Odds for each item are determined by N.
+`!r dice N (name='...')` Rolls a dice from 1-N.
+`!r list name:N name:N... (name='...')` Selects a random item in a list. Odds for each item are determined by N.
 
 ## License
 
-Copyright © 2020 FIXME
+Copyright © 2021
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at

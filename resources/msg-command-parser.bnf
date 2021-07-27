@@ -1,6 +1,6 @@
-command = mention? <whitespace> demand <whitespace> {statement <whitespace?>}
+command = <mention?> <whitespace> demand (<whitespace> args)?
 
-demand = <"!"> word
+args = {statement <whitespace?>}
 
 <statement> = word
           | int
@@ -8,7 +8,11 @@ demand = <"!"> word
           | string
           | statement-pair
           | keyword
+          | demand
+          | mention
           | (<"("> command <")">)
+
+demand = <"!"> word
 
 mention = '<@!' int '>'
 

@@ -27,7 +27,7 @@
   (when (some #{@bot-id} (map :id mentions))
     (if (= content "<@!865428758940745728> !kill")
       (discord-ws/disconnect-bot! (:gateway @state))
-      (discord-rest/create-message! (:rest @state) channel-id :content (dice/string-to-command content)))))
+      (discord-rest/create-message! (:rest @state) channel-id :content (dice/process-command content)))))
 
 ;; (when (some #{@bot-id} (map :id mentions))
 ;;    (discord-rest/create-message! (:rest @state) channel-id :content (random-response author)))

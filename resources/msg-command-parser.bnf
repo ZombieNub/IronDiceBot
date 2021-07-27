@@ -2,7 +2,8 @@ command = <mention?> <whitespace> demand (<whitespace> args)?
 
 args = {statement <whitespace?>}
 
-<statement> = word
+<statement> = punctuation
+          | word
           | int
           | float
           | string
@@ -28,6 +29,6 @@ string = <'\"'> {word | whitespace | punctuation} <'\"'>
 
 word = #'\w+' &#'\W|$'
 
-punctuation = #'\p{Punct}'
+punctuation = #'\p{Punct}+'
 
 whitespace = #"\s+"
